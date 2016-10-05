@@ -55,7 +55,10 @@ exports.addUrlToList = function(url, cb) {
   });
 };
 
-exports.isUrlArchived = function() {
+exports.isUrlArchived = function(url, cb) {
+  fs.stat(exports.paths.archivedSites + '/' + url, function(err, stats) {
+    cb(!!stats);
+  });
 };
 
 exports.downloadUrls = function() {
