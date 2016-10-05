@@ -42,7 +42,17 @@ exports.isUrlInList = function(url, cb) {
   });
 };
 
-exports.addUrlToList = function() {
+exports.addUrlToList = function(url, cb) {
+  fs.open(exports.paths.list, 'a+', function(error, fd) {
+    fs.write(fd, url + '\n', (error) => {
+      if (error) {
+        console.log('our error: ');
+        throw error;
+      }
+      fs.close(fd);
+      cb();
+    });
+  });
 };
 
 exports.isUrlArchived = function() {

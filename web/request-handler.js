@@ -25,7 +25,7 @@ exports.handleRequest = function (request, response) {
     request.on('end', function() {
       body = Buffer.concat(body).toString().slice(4);
       console.log('body: ', body);
-      helper.updateAssets(body);
+      archive.addUrlToList(body);
       response.end();
     });
   }

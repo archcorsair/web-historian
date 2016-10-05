@@ -18,19 +18,6 @@ exports.serveAssets = function(response, asset, callback) {
   } );
 };
 
-exports.updateAssets = function(url) {
-  fs.open(archive.paths.list, 'a+', function(error, fd) {
-    fs.write(fd, url + '\n', (error) => {
-      if (error) {
-        console.log('our error: ');
-        throw error;
-      }
-      console.log('File appended');
-      fs.close(fd);
-    });
-  });
-};
-
 
 
 // As you progress, keep thinking about what helper functions you can put here!
