@@ -2,8 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
 var http = require('http');
-var xhr = require('xhr');
-var $ = require('jquery');
+var https = require('https');
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -36,12 +35,21 @@ exports.writeArchiveFile = function(data, filename) {
   });
 };
 
+exports.clearListOfUrls = function() {
+  fs.writeFile(exports.paths.list, '', function(e) {
+    if (e) {
+      console.error(e);
+    }
+  });
+};
+
 exports.readListOfUrls = function(cb) {
   fs.readFile(exports.paths.list, function (err, data) {
     if (err) {
       throw err;
     } else {
       var urls = data.toString().split('\n');
+      urls = _.filter(urls, url => url !== '');
       cb(urls);
     }
   });
@@ -83,21 +91,48 @@ exports.downloadUrls = function(urls) {
   _.each(urls, url => { exports.addNewSite(url); });
 };
 
-exports.downloadUrl = function(url, cb) {
-
-  http.get({
-    host: url,
-    path: '/'
-  }, function(response) {
-    var body = '';
-    response.on('data', function(data) {
-      body += data;
+exports.downloadUrl = function(url, cb, httpFlag) {
+  if (!httpFlag) {
+    https.get({
+      host: url,
+    }, function(response) {
+      console.log(response.statusCode);
+      var body = '';
+      response.on('data', function(data) {
+        body += data;
+      });
+      response.on('end', function() {
+        if (response.statusCode === 301 || response.statusCode === 302) {
+          var sanitizedUrl = response.headers.location.slice(response.headers.location.indexOf('//') + 2);
+          sanitizedUrl = sanitizedUrl.slice(0, sanitizedUrl.length - 1);
+          exports.downloadUrl(sanitizedUrl, cb, true);
+        } else {
+          cb(body, url);
+        }
+      });
     });
-    response.on('end', function() {
-      cb(body, url);
+  } else {
+    http.get({
+      host: url,
+    }, function(response) {
+      console.log(response.statusCode);
+      var body = '';
+      response.on('data', function(data) {
+        body += data;
+      });
+      response.on('end', function() {
+        if (response.statusCode === 301 || response.statusCode === 302) {
+          var sanitizedUrl = response.headers.location.slice(response.headers.location.indexOf('//') + 2);
+          sanitizedUrl = sanitizedUrl.slice(0, sanitizedUrl.length - 1);
+          exports.downloadUrl(sanitizedUrl, cb, false);
+        } else {
+          cb(body, url);
+        }
+      });
     });
-  });
+  }
 
+  // The OTHER ways to AJAX
   // $.ajax({
   //   type: 'GET',
   //   url: `http://${url}`,
