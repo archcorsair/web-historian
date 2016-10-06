@@ -33,7 +33,7 @@ exports.handleGET = function(request, response) {
   } else if (url === '/public/loading.html') {
     exports.serveAssets(response, archive.paths.siteAssets + '/loading.html');
   } else if (url.includes('www')) {
-    exports.serveAssets(response, archive.paths.archivedSites + '/' + url)
+    exports.serveAssets(response, archive.paths.archivedSites + '/' + url);
   } else {
     response.writeHead(404);
     response.end();
