@@ -5,6 +5,9 @@ var archive = require('../helpers/archive-helpers');
 var path = require('path');
 var supertest = require('supertest');
 var initialize = require('../web/initialize.js');
+var $ = require('jquery');
+var xhr = require('xhr');
+
 
 initialize(path.join(__dirname, '/testdata'));
 
@@ -155,4 +158,3 @@ describe('archive helpers', function() {
     });
   });
 });
-

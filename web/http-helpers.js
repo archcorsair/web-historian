@@ -15,7 +15,7 @@ exports.serveAssets = function(response, asset, callback) {
     console.log(asset);
     response.writeHead(200, exports.headers);
     response.end(data);
-  } );
+  });
 };
 
 

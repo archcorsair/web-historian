@@ -1,6 +1,9 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
+var http = require('http');
+var xhr = require('xhr');
+var $ = require('jquery');
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -24,6 +27,14 @@ exports.initialize = function(pathsObj) {
 
 // The following function names are provided to you to suggest how you might
 // modularize your code. Keep it clean!
+
+exports.writeArchiveFile = function(data, filename) {
+  fs.writeFile(exports.paths.archivedSites + '/' + filename, data, function(error) {
+    if (error) {
+      console.error(error);
+    }
+  });
+};
 
 exports.readListOfUrls = function(cb) {
   fs.readFile(exports.paths.list, function (err, data) {
@@ -61,5 +72,52 @@ exports.isUrlArchived = function(url, cb) {
   });
 };
 
-exports.downloadUrls = function() {
+exports.addNewSite = function(url) {
+  exports.downloadUrl(url, exports.writeArchiveFile);
+};
+
+exports.downloadUrls = function(urls) {
+  _.each(urls, url => { exports.addNewSite(url); });
+};
+
+exports.downloadUrl = function(url, cb) {
+
+  http.get({
+    host: url,
+    path: '/'
+  }, function(response) {
+    var body = '';
+    response.on('data', function(data) {
+      body += data;
+    });
+    response.on('end', function() {
+      cb(body, url);
+    });
+  });
+
+  // $.ajax({
+  //   type: 'GET',
+  //   url: `http://${url}`,
+  //   complete: function(data) {
+  //     cb(data.responseText, url);
+  //   },
+  //   fail: function(e) {
+  //     console.error(e);
+  //   }
+  // });
+
+  // xhr({
+  //   method: 'get',
+  //   url: `http://${url}`
+  // }, function (err, resp, body) {
+  //   cb(body, url);
+  // });
+
+  // var request = new XMLHttpRequest();
+  // request.addEventListener('load', function(event) {
+  //   console.log('url: ', url);
+  //   cb(event.srcElement.responseText, url);
+  // });
+  // request.open('GET', url, true);
+  // request.send();
 };
