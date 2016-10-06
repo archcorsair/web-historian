@@ -13,7 +13,7 @@ exports.headers = {
 exports.serveAssets = function(response, filePath, callback) {
   // To avoid mutating the original headers object
   var localHeaders = JSON.parse(JSON.stringify(exports.headers));
-  if (filePath.includes('.css')) {
+  if (filePath.endsWith('.css')) {
     localHeaders['Content-Type'] = 'text/css';
   }
   fs.readFile(filePath, (error, data) => {
@@ -28,7 +28,7 @@ exports.handleGET = function(request, response) {
 
   if (url === '/') {
     exports.serveAssets(response, archive.paths.siteAssets + '/index.html');
-  } else if (url.includes('.css')) {
+  } else if (url.endsWith('.css')) {
     exports.serveAssets(response, archive.paths.siteAssets + url);
   } else if (url === '/public/loading.html') {
     exports.serveAssets(response, archive.paths.siteAssets + '/loading.html');
